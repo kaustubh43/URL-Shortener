@@ -70,3 +70,11 @@
 >
 > Redirect to original URL
 >> GET /{short_code}  -> 302 TEMPORARY REDIRECT
+
+### Project setup
+> create a file name application-dev.properties at `URL-Shortener\src\main\resources\application-dev.properties`
+> 
+> with contents:
+> db.url=<url of db>
+> db.username=<username of db>
+> db.password=<password of db>
