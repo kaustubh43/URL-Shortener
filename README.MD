@@ -12,21 +12,17 @@
 >>
 >> Expiration time
 >
-> 1.Retrieve original url if shortened url is provided.
+> 2.Retrieve original url if shortened url is provided.
 >
-> 2.Delete a URL.
+> 3.Delete a URL.
 
 ### Additional Requirements (Future Scope)
 <details>
 <summary>Click to expand</summary>
 
-1. Shorten URL with custom alias.
+1. User Authentication
 
-2. Specify expiration date.
-
-3. User Authentication
-
-4. Analytics on clicks
+2. Analytics on clicks
 
 </details>
 
@@ -40,7 +36,7 @@
 >> POST
 >
 > Get the original url from the shortened URL
->> Get
+>> GET
 >
 > Update an existing shortened URL
 >> PUT
@@ -75,6 +71,10 @@
 > create a file name application-dev.properties at `URL-Shortener\src\main\resources\application-dev.properties`
 > 
 > with contents:
-> db.url=<url of db>
-> db.username=<username of db>
-> db.password=<password of db>
+> 
+> `db.url={url of db}`
+> 
+> `db.username={username of db}`
+> 
+> `db.password={password of db}`
+
