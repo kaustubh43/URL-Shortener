@@ -7,6 +7,7 @@ import org.urlshortener.urlshortener.utils.shortener.Base62Util;
 import org.urlshortener.urlshortener.utils.shortener.IdScramblerUtil;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Component
 public class UrlServiceImpl implements UrlService {
@@ -48,6 +49,15 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     public String resolveOriginalUrl(String shortAlias) {
-        return "";
+        // Decode id from string to scrambled id.
+        long decodedId = base62Util.decode(shortAlias);
+        // Unscramble id to Database id.
+        long unscrambledDbId = idScramblerUtil.unscramble(decodedId);
+
+        Optional<UrlMapping> urlMapping = urlMappingRepository.findById(unscrambledDbId);
+        if (urlMapping.isEmpty()) {
+            return "";
+        }
+        return urlMapping.get().getLongUrl();
     }
 }

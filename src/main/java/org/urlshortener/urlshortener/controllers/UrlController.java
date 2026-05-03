@@ -1,10 +1,14 @@
 package org.urlshortener.urlshortener.controllers;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.urlshortener.urlshortener.dtos.CreateShortUrlRequest;
+import org.urlshortener.urlshortener.exceptions.UrlNotFoundException;
 import org.urlshortener.urlshortener.services.UrlService;
+
+import java.net.URI;
 
 @RestController
 public class UrlController {
@@ -17,5 +21,16 @@ public class UrlController {
     @PostMapping
     public String shortenUrl(@RequestBody CreateShortUrlRequest request) {
         return urlService.shortenUrl(request.getLongUrl());
+    }
+
+    @GetMapping("/{shortUrl}")
+    public ResponseEntity<Void> resolveLongUrl(@PathVariable String shortUrl) throws UrlNotFoundException {
+        String resolvedUrl = urlService.resolveOriginalUrl(shortUrl);
+        if(resolvedUrl == null) {
+            throw new UrlNotFoundException("Url not resolved for: " + shortUrl);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(resolvedUrl));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 }
