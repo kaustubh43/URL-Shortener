@@ -23,7 +23,7 @@ public class UrlMapping extends BaseModel {
     @Column(name = "long_url", nullable = false, length = 2048)
     String longUrl;
 
-    @Column(name = "short_url", nullable = false, length = 2048)
+    @Column(name = "short_url", length = 2048)
     String shortUrl;
 
     @Column(name = "expires_at")
