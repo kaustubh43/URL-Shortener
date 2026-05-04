@@ -20,7 +20,11 @@ public class UrlController {
 
     @PostMapping
     public String shortenUrl(@RequestBody CreateShortUrlRequest request) {
-        return urlService.shortenUrl(request.getLongUrl());
+        if (request.getExpiresAt() == null) {
+            return urlService.shortenUrl(request.getLongUrl());
+        } else {
+            return urlService.shortenUrl(request.getLongUrl(), request.getExpiresAt());
+        }
     }
 
     @GetMapping("/{shortUrl}")

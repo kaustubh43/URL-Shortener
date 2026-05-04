@@ -12,9 +12,9 @@ import java.util.Optional;
 @Component
 public class UrlServiceImpl implements UrlService {
 
-    private Base62Util base62Util;
-    private IdScramblerUtil idScramblerUtil;
-    private UrlMappingRepository urlMappingRepository;
+    private final Base62Util base62Util;
+    private final IdScramblerUtil idScramblerUtil;
+    private final UrlMappingRepository urlMappingRepository;
 
     public UrlServiceImpl(Base62Util base62Util, IdScramblerUtil idScramblerUtil, UrlMappingRepository urlMappingRepository) {
         this.base62Util = base62Util;
@@ -24,8 +24,14 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     public String shortenUrl(String originalUrl) {
+        return shortenUrl(originalUrl, null);
+    }
+
+    @Override
+    public String shortenUrl(String originalUrl, Instant expiresAt) {
         UrlMapping urlMapping = new UrlMapping();
         urlMapping.setLongUrl(originalUrl);
+        urlMapping.setExpiresAt(expiresAt);
 
         // Save and get database id.
         UrlMapping savedUrlMapping = urlMappingRepository.save(urlMapping);
@@ -43,21 +49,19 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
-    public String shortenUrl(String originalUrl, Instant expiresAt) {
-        return "";
+    public String resolveOriginalUrl(String shortAlias) {
+        Optional<UrlMapping> optionalUrlMapping = urlMappingRepository.findByShortUrl(shortAlias);
+        return optionalUrlMapping
+                .filter(urlMapping -> checkExpiryDate(urlMapping.getExpiresAt()))
+                .map(UrlMapping::getLongUrl)
+                .orElse(null);
     }
 
-    @Override
-    public String resolveOriginalUrl(String shortAlias) {
-        // Decode id from string to scrambled id.
-        long decodedId = base62Util.decode(shortAlias);
-        // Unscramble id to Database id.
-        long unscrambledDbId = idScramblerUtil.unscramble(decodedId);
-
-        Optional<UrlMapping> urlMapping = urlMappingRepository.findById(unscrambledDbId);
-        if (urlMapping.isEmpty()) {
-            return "";
-        }
-        return urlMapping.get().getLongUrl();
+    /*
+    Checks expiry date
+    If null then return True or
+     */
+    public static boolean checkExpiryDate(Instant expiryDate) {
+        return expiryDate == null || Instant.now().isBefore(expiryDate);
     }
 }
