@@ -1,80 +1,56 @@
-# URL Shortener (WIP: 👷🔧)
-> A backend application for shortening URLs using spring boot as backend framework
-> and MySQL as a database.
+# URL Shortener
+> A Spring Boot backend for shortening URLs with optional expiration and MySQL persistence.
 
-### Swagger docs
-- http://localhost:8080/swagger-ui/index.html
+## Overview
+This service creates short aliases for long URLs and redirects requests to the original URL. Expiration is optional and uses ISO-8601 timestamps (UTC).
 
+## Features (Current)
+- Shorten a URL
+- Resolve a short URL via HTTP 302 redirect
+- Optional expiration timestamp
 
-## Functional Requirements
-> 1. Shorten a URL
->> Custom alias
->>
->> Expiration time
->
-> 1.Retrieve original url if shortened url is provided.
->
-> 2.Delete a URL.
-
-### Additional Requirements (Future Scope)
-<details>
-<summary>Click to expand</summary>
-
-1. Shorten URL with custom alias.
-
-2. Specify expiration date.
-
-3. User Authentication
-
-4. Analytics on clicks
-
-</details>
-
-## Core Entities
-- Original URL
-- Short URL
-- User
+## Tech Stack
+- Java 26
+- Spring Boot 4 (WebMVC, Data JPA)
+- MySQL
+- Lombok
 
 ## API
-> Create a new shortened URL
->> POST
->
-> Get the original url from the shortened URL
->> Get
->
-> Update an existing shortened URL
->> PUT
->
-> Delete an existing URL
->> DELETE
+### Shorten URL
+- `POST /`
+- Request body:
+```json
+{
+  "longUrl": "https://example.com/some/very/long/url",
+  "expiresAt": "2026-05-04T20:26:59Z"
+}
+```
+- Response body (string):
+```
+abc123
+```
 
-## Endpoints
-> Shorten URL
->> POST /urls
->>
->>{
->>
->>    "long_url": "https://example.com/some/very/veryy/long/url",
->>
->>    "custom_alias": "optional_custom_alias",
->>
->>    "expiration": "optional_expiration_date",
->>
->>}
->> -> 201 CREATED
->>{
->>
->>  "short_url": "http://short.ly/abc123"
->>
->>}
->
-> Redirect to original URL
->> GET /{short_code}  -> 302 TEMPORARY REDIRECT
+### Resolve Short URL
+- `GET /{shortUrl}`
+- Response: `302 FOUND` with `Location` header pointing to the original URL
 
-### Project setup
-> create a file name application-dev.properties at `URL-Shortener\src\main\resources\application-dev.properties`
-> 
-> with contents:
-> db.url=<url of db>
-> db.username=<username of db>
-> db.password=<password of db>
+## Project Setup
+1. Ensure MySQL is running and accessible.
+2. Configure database settings in `src/main/resources/application.properties`.
+3. Run the application.
+
+```zsh
+./mvnw spring-boot:run
+```
+
+### Run Tests
+```zsh
+./mvnw test
+```
+
+## Future Scope
+- Custom alias support
+- URL deletion and update endpoints
+- User authentication and ownership
+- Click analytics and rate limiting
+- Expiration management UI and cleanup jobs
