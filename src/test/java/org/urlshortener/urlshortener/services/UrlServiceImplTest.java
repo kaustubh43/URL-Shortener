@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.urlshortener.urlshortener.exceptions.UrlExpired;
 import org.urlshortener.urlshortener.models.UrlMapping;
 import org.urlshortener.urlshortener.repositories.UrlMappingRepository;
 import org.urlshortener.urlshortener.utils.shortener.Base62Util;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -86,7 +88,7 @@ class UrlServiceImplTest {
 
         when(urlMappingRepository.findByShortUrl("abc")).thenReturn(Optional.of(mapping));
 
-        assertNull(urlService.resolveOriginalUrl("abc"));
+        assertThrows(UrlExpired.class, () -> urlService.resolveOriginalUrl("abc"));
     }
 
     @Test
@@ -96,4 +98,3 @@ class UrlServiceImplTest {
         assertNull(urlService.resolveOriginalUrl("missing"));
     }
 }
-

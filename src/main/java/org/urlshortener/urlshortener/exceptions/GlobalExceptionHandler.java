@@ -8,10 +8,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /*
-    Handle all UrlNotFoundExceptions.
+     * Handle all UrlNotFoundExceptions.
      */
     @ExceptionHandler(UrlNotFoundException.class)
     public ResponseEntity<String> handleUrlNotFoundException(UrlNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    /*
+     * Handle all UrlNotFoundExceptions.
+     */
+    @ExceptionHandler(UrlExpired.class)
+    public ResponseEntity<String> handleUrlExpired(UrlExpired ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

@@ -1,6 +1,7 @@
 package org.urlshortener.urlshortener.services;
 
 import org.springframework.stereotype.Component;
+import org.urlshortener.urlshortener.exceptions.UrlExpired;
 import org.urlshortener.urlshortener.models.UrlMapping;
 import org.urlshortener.urlshortener.repositories.UrlMappingRepository;
 import org.urlshortener.urlshortener.utils.shortener.Base62Util;
@@ -58,10 +59,14 @@ public class UrlServiceImpl implements UrlService {
     }
 
     /*
-    Checks expiry date
-    If null then return True or
+     * Checks expiry date
+     * If null then return True or
+     * @throws: UrlExpired when url is expired.
      */
     public static boolean checkExpiryDate(Instant expiryDate) {
-        return expiryDate == null || Instant.now().isBefore(expiryDate);
+        if (expiryDate != null && Instant.now().isAfter(expiryDate)) {
+            throw new UrlExpired("URL has expired");
+        }
+        return true;
     }
 }

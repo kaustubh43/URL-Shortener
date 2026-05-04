@@ -15,7 +15,8 @@ public interface UrlService {
 
     /**
      * Resolves a short alias back to the original URL.
-     * @throws org.urlshortener.urlshortener.exceptions.UrlNotFoundException if the alias is missing or expired
+     * @throws org.urlshortener.urlshortener.exceptions.UrlNotFoundException if the alias is missing
+     * @throws org.urlshortener.urlshortener.exceptions.UrlExpired if the alias is expired
      */
     String resolveOriginalUrl(String shortAlias);
 }
