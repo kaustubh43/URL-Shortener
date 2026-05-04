@@ -22,4 +22,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUrlExpired(UrlExpired ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    /*
+     * Handle all UrlAlreadyExists.
+     */
+    @ExceptionHandler(UrlAlreadyExists.class)
+    public ResponseEntity<String> handleUrlExpired(UrlAlreadyExists ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

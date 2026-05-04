@@ -84,6 +84,11 @@ class UrlControllerTest {
         public String resolveOriginalUrl(String shortAlias) {
             return resolvedUrl;
         }
+
+        @Override
+        public String shortenUrl(String longUrl, String customUrl, Instant expiresAt) {
+            return "";
+        }
     }
 }
 

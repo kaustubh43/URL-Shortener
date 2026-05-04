@@ -19,4 +19,12 @@ public interface UrlService {
      * @throws org.urlshortener.urlshortener.exceptions.UrlExpired if the alias is expired
      */
     String resolveOriginalUrl(String shortAlias);
+
+    /**
+     * @param longUrl
+     * @param customUrl
+     * @param expiresAt
+     * @return
+     */
+    String shortenUrl(String longUrl, String customUrl, Instant expiresAt);
 }

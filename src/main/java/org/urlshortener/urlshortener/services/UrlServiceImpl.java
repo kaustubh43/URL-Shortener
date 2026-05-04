@@ -1,6 +1,7 @@
 package org.urlshortener.urlshortener.services;
 
 import org.springframework.stereotype.Component;
+import org.urlshortener.urlshortener.exceptions.UrlAlreadyExists;
 import org.urlshortener.urlshortener.exceptions.UrlExpired;
 import org.urlshortener.urlshortener.models.UrlMapping;
 import org.urlshortener.urlshortener.repositories.UrlMappingRepository;
@@ -56,6 +57,22 @@ public class UrlServiceImpl implements UrlService {
                 .filter(urlMapping -> checkExpiryDate(urlMapping.getExpiresAt()))
                 .map(UrlMapping::getLongUrl)
                 .orElse(null);
+    }
+
+    @Override
+    public String shortenUrl(String longUrl, String customUrl, Instant expiresAt) {
+        Optional<UrlMapping> optionalUrlMapping = urlMappingRepository.findByShortUrl(customUrl);
+        if(optionalUrlMapping.isPresent()) {
+            throw new UrlAlreadyExists("URL is already taken, choose another custom URL");
+        }
+
+        UrlMapping urlMapping = new UrlMapping();
+        urlMapping.setLongUrl(longUrl);
+        urlMapping.setShortUrl(customUrl);
+        urlMapping.setExpiresAt(expiresAt);
+
+        UrlMapping savedUrlMapping = urlMappingRepository.save(urlMapping);
+        return savedUrlMapping.getShortUrl();
     }
 
     /*

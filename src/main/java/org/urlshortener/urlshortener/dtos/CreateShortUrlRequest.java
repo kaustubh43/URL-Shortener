@@ -17,4 +17,7 @@ public class CreateShortUrlRequest {
 
     @Nullable
     Instant expiresAt;
+
+    @Nullable
+    String customUrl;
 }

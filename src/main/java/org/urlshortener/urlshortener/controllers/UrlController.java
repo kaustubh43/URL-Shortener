@@ -22,8 +22,10 @@ public class UrlController {
     public String shortenUrl(@RequestBody CreateShortUrlRequest request) {
         if (request.getExpiresAt() == null) {
             return urlService.shortenUrl(request.getLongUrl());
-        } else {
+        } else if (request.getCustomUrl() == null) {
             return urlService.shortenUrl(request.getLongUrl(), request.getExpiresAt());
+        } else {
+            return urlService.shortenUrl(request.getLongUrl(), request.getCustomUrl(), request.getExpiresAt());
         }
     }
 

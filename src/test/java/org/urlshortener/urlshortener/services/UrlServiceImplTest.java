@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.urlshortener.urlshortener.exceptions.UrlAlreadyExists;
 import org.urlshortener.urlshortener.exceptions.UrlExpired;
 import org.urlshortener.urlshortener.models.UrlMapping;
 import org.urlshortener.urlshortener.repositories.UrlMappingRepository;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -96,5 +98,43 @@ class UrlServiceImplTest {
         when(urlMappingRepository.findByShortUrl("missing")).thenReturn(Optional.empty());
 
         assertNull(urlService.resolveOriginalUrl("missing"));
+    }
+
+    @Test
+    void shortenUrlWithCustomAliasReturnsAliasWhenAvailable() {
+        String longUrl = "https://example.com";
+        Instant expiresAt = Instant.now().plusSeconds(600);
+        String customAlias = "my-custom";
+
+        when(urlMappingRepository.findByShortUrl(customAlias)).thenReturn(Optional.empty());
+
+        UrlMapping savedMapping = new UrlMapping();
+        savedMapping.setShortUrl(customAlias);
+        when(urlMappingRepository.save(any(UrlMapping.class))).thenReturn(savedMapping);
+
+        String alias = urlService.shortenUrl(longUrl, customAlias, expiresAt);
+
+        assertEquals(customAlias, alias);
+
+        ArgumentCaptor<UrlMapping> captor = ArgumentCaptor.forClass(UrlMapping.class);
+        verify(urlMappingRepository).save(captor.capture());
+
+        UrlMapping saved = captor.getValue();
+        assertEquals(longUrl, saved.getLongUrl());
+        assertEquals(customAlias, saved.getShortUrl());
+        assertEquals(expiresAt, saved.getExpiresAt());
+    }
+
+    @Test
+    void shortenUrlWithCustomAliasThrowsWhenTaken() {
+        String customAlias = "taken";
+        UrlMapping existing = new UrlMapping();
+        existing.setShortUrl(customAlias);
+
+        when(urlMappingRepository.findByShortUrl(customAlias)).thenReturn(Optional.of(existing));
+
+        assertThrows(UrlAlreadyExists.class, () -> urlService.shortenUrl("https://example.com", customAlias, null));
+
+        verify(urlMappingRepository, never()).save(any(UrlMapping.class));
     }
 }
